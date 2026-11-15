@@ -2,24 +2,24 @@
 const crypto = require('node:crypto');
 const { db } = require('./db');
 
-const getUser = db.prepare('SELECT * FROM users WHERE id = ? AND active = 1');
-
 // Charge l'utilisateur connecté et expose des helpers aux vues.
-function loadUser(req, res, next) {
-  res.locals.user = null;
-  if (req.session.userId) {
-    const user = getUser.get(req.session.userId);
-    if (user) {
-      req.user = user;
-      res.locals.user = user;
-    } else {
-      delete req.session.userId;
+async function loadUser(req, res, next) {
+  try {
+    res.locals.user = null;
+    if (req.session.userId) {
+      const user = await db.get('SELECT * FROM users WHERE id = ? AND active = 1', req.session.userId);
+      if (user) {
+        req.user = user;
+        res.locals.user = user;
+      } else {
+        delete req.session.userId;
+      }
     }
-  }
-  res.locals.path = req.path;
-  res.locals.flash = req.session.flash || null;
-  delete req.session.flash;
-  next();
+    res.locals.path = req.path;
+    res.locals.flash = req.session.flash || null;
+    delete req.session.flash;
+    next();
+  } catch (e) { next(e); }
 }
 
 // Toute page (sauf connexion) exige un résident authentifié.
