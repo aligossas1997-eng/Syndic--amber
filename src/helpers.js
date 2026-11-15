@@ -28,13 +28,13 @@ const toDate = (s) => (s ? new Date(String(s).replace(' ', 'T') + (String(s).len
 
 function date(s) {
   const d = toDate(s);
-  return d ? d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Europe/Paris' }) : '';
+  return d ? d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Africa/Casablanca' }) : '';
 }
 function dateTime(s) {
   const d = toDate(s);
-  return d ? d.toLocaleString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Paris' }) : '';
+  return d ? d.toLocaleString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'Africa/Casablanca' }) : '';
 }
-// Les événements sont saisis en heure locale (Paris) : on les affiche tels quels.
+// Les événements sont saisis en heure locale (Maroc) : on les affiche tels quels.
 function eventDate(s) {
   const d = new Date(String(s).replace(' ', 'T'));
   return {
@@ -46,7 +46,8 @@ function eventDate(s) {
   };
 }
 function money(cents) {
-  return (Number(cents || 0) / 100).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' });
+  // Dirham marocain, affiché « 1 200,00 DH ».
+  return `${(Number(cents || 0) / 100).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} DH`;
 }
 function fileSize(bytes) {
   if (bytes < 1024) return `${bytes} o`;
