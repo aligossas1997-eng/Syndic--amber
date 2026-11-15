@@ -1,0 +1,30 @@
+<%- include('partials/header') %>
+<div class="page-head"><h1>Contacts utiles</h1></div>
+<div class="card urgent-box">
+  <strong>Urgences :</strong> SAMU <a href="tel:15">15</a> · Police <a href="tel:17">17</a> · Pompiers <a href="tel:18">18</a> · Numéro européen <a href="tel:112">112</a> · Urgence gaz GRDF <a href="tel:0800473333">0 800 47 33 33</a>
+</div>
+<div class="grid grid-3">
+<% for (const c of list) { %>
+  <article class="card contact">
+    <span class="muted small"><%= c.role %></span>
+    <h3><%= c.name %></h3>
+    <% if (c.phone) { %><p>📞 <a href="tel:<%= c.phone.replace(/\s/g, '') %>"><%= c.phone %></a></p><% } %>
+    <% if (c.email) { %><p>✉️ <a href="mailto:<%= c.email %>"><%= c.email %></a></p><% } %>
+    <% if (c.notes) { %><p class="muted small"><%= c.notes %></p><% } %>
+    <% if (user.role === 'admin') { %><form method="post" action="/contacts/<%= c.id %>/supprimer" data-confirm="Supprimer ce contact ?"><%- include('partials/csrf') %><button class="link danger small">Supprimer</button></form><% } %>
+  </article>
+<% } %>
+</div>
+<% if (user.role === 'admin') { %>
+<details class="card admin-box mt">
+  <summary>➕ Ajouter un contact</summary>
+  <form method="post" action="/contacts" class="form">
+    <%- include('partials/csrf') %>
+    <div class="row"><label>Nom<input name="name" required></label><label>Fonction<input name="role" required placeholder="Gardien, plombier…"></label></div>
+    <div class="row"><label>Téléphone<input name="phone"></label><label>Email<input type="email" name="email"></label></div>
+    <div class="row"><label>Remarques<input name="notes" placeholder="Horaires, astreinte…"></label><label>Ordre d'affichage<input type="number" name="sort_order" value="10" min="0"></label></div>
+    <button class="btn btn-primary">Ajouter</button>
+  </form>
+</details>
+<% } %>
+<%- include('partials/footer') %>

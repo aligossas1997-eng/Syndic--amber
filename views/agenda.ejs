@@ -1,0 +1,35 @@
+<%- include('partials/header') %>
+<div class="page-head"><h1>Agenda de la résidence</h1></div>
+<% if (user.role === 'admin') { %>
+<details class="card admin-box">
+  <summary>➕ Ajouter un événement</summary>
+  <form method="post" action="/agenda" class="form">
+    <%- include('partials/csrf') %>
+    <label>Titre<input name="title" required maxlength="200"></label>
+    <div class="row">
+      <label>Date et heure<input type="datetime-local" name="starts_at" required></label>
+      <label>Type<select name="kind"><% for (const [k, v] of Object.entries(h.EVENT_KINDS)) { %><option value="<%= k %>"><%= v %></option><% } %></select></label>
+    </div>
+    <label>Lieu<input name="location" maxlength="200"></label>
+    <label>Description<textarea name="description" rows="3"></textarea></label>
+    <button class="btn btn-primary">Ajouter</button>
+  </form>
+</details>
+<% } %>
+<% function renderEvents(list) { for (const ev of list) { const e = h.eventDate(ev.starts_at); %>
+  <article class="card event">
+    <div class="event-date"><span class="d"><%= e.day %></span><span class="m"><%= e.month %></span></div>
+    <div class="event-body">
+      <span class="tag tag-<%= ev.kind %>"><%= h.EVENT_KINDS[ev.kind] %></span>
+      <h3><%= ev.title %></h3>
+      <p class="muted small"><%= e.full %> à <%= e.time %><% if (ev.location) { %> · 📍 <%= ev.location %><% } %></p>
+      <% if (ev.description) { %><div class="prose small"><%= ev.description %></div><% } %>
+    </div>
+    <% if (user.role === 'admin') { %><form method="post" action="/agenda/<%= ev.id %>/supprimer" data-confirm="Supprimer cet événement ?"><%- include('partials/csrf') %><button class="link danger small">Supprimer</button></form><% } %>
+  </article>
+<% } } %>
+<h2>À venir</h2>
+<% if (!upcoming.length) { %><div class="card empty">Aucun événement prévu.</div><% } %>
+<% renderEvents(upcoming) %>
+<% if (past.length) { %><h2 class="mt">Passés</h2><div class="past"><% renderEvents(past) %></div><% } %>
+<%- include('partials/footer') %>

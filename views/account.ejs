@@ -1,0 +1,26 @@
+<%- include('partials/header') %>
+<div class="page-head"><h1>Mon compte</h1></div>
+<div class="grid grid-2 align-start">
+  <section class="card">
+    <h2>Mes informations</h2>
+    <dl class="dl">
+      <dt>Nom</dt><dd><%= user.first_name %> <%= user.last_name %></dd>
+      <dt>Email</dt><dd><%= user.email %></dd>
+      <dt>Logement</dt><dd>Bât. <%= user.building || '—' %> · Appt <%= user.apartment || '—' %></dd>
+      <dt>Lot</dt><dd><%= user.lot_number || '—' %> (<%= user.tantiemes || 0 %> tantièmes)</dd>
+      <dt>Statut</dt><dd><%= user.status === 'locataire' ? 'Locataire' : 'Copropriétaire' %><%= user.role === 'admin' ? ' · Administrateur' : '' %></dd>
+    </dl>
+    <p class="muted small">Une information erronée ? Contactez le syndic.</p>
+  </section>
+  <section class="card">
+    <h2>Coordonnées</h2>
+    <form method="post" action="/mon-compte" class="form">
+      <%- include('partials/csrf') %>
+      <label>Téléphone<input name="phone" value="<%= user.phone || '' %>"></label>
+      <button class="btn">Enregistrer</button>
+    </form>
+    <h2 class="mt">Sécurité</h2>
+    <a class="btn" href="/mon-compte/mot-de-passe">Changer mon mot de passe</a>
+  </section>
+</div>
+<%- include('partials/footer') %>

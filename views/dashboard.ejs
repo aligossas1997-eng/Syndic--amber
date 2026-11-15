@@ -1,0 +1,56 @@
+<%- include('partials/header') %>
+<section class="hero">
+  <h1>Bonjour <%= user.first_name %> 👋</h1>
+  <p class="muted"><% if (user.building || user.apartment) { %>Bâtiment <%= user.building || '–' %> · Appartement <%= user.apartment || '–' %><% if (user.lot_number) { %> · Lot n°<%= user.lot_number %><% } %><% } else { %>Bienvenue dans votre espace résident.<% } %></p>
+</section>
+
+<div class="grid grid-3 stats">
+  <a class="stat card" href="/charges">
+    <span class="stat-label">Solde à régler</span>
+    <span class="stat-value <%= due.total > 0 ? 'warn' : 'ok' %>"><%= h.money(due.total) %></span>
+    <span class="muted small"><% if (nextCharge) { %>Prochaine échéance : <%= h.date(nextCharge.due_date) %><% } else { %>Vous êtes à jour 👍<% } %></span>
+  </a>
+  <a class="stat card" href="/signalements">
+    <span class="stat-label">Mes signalements en cours</span>
+    <span class="stat-value"><%= tickets.length %></span>
+    <span class="muted small">Un problème ? Signalez-le en 1 minute</span>
+  </a>
+  <a class="stat card" href="/agenda">
+    <span class="stat-label">Prochain rendez-vous</span>
+    <% if (events[0]) { const e = h.eventDate(events[0].starts_at); %>
+      <span class="stat-value small-value"><%= events[0].title %></span>
+      <span class="muted small"><%= e.full %> à <%= e.time %></span>
+    <% } else { %><span class="stat-value small-value">Rien de prévu</span><span class="muted small">Agenda à jour</span><% } %>
+  </a>
+</div>
+
+<div class="grid grid-2">
+  <section class="card">
+    <div class="card-head"><h2>Dernières annonces</h2><a href="/annonces" class="small">Tout voir →</a></div>
+    <% if (!announcements.length) { %><p class="muted">Aucune annonce pour le moment.</p><% } %>
+    <% for (const a of announcements) { %>
+      <article class="ann-mini">
+        <span class="tag tag-<%= a.category %>"><%= h.ANNOUNCEMENT_CATEGORIES[a.category] %></span><% if (a.pinned) { %> <span class="pin">📌</span><% } %>
+        <h3><%= a.title %></h3>
+        <p class="muted small"><%= h.date(a.created_at) %></p>
+      </article>
+    <% } %>
+  </section>
+  <section class="card">
+    <div class="card-head"><h2>Mes signalements</h2><a href="/signalements" class="small">Nouveau →</a></div>
+    <% if (!tickets.length) { %><p class="muted">Aucun signalement en cours.</p><% } %>
+    <ul class="list">
+    <% for (const t of tickets) { %>
+      <li><a href="/signalements/<%= t.id %>"><%= t.title %></a> <span class="status status-<%= t.status %>"><%= h.TICKET_STATUSES[t.status] %></span></li>
+    <% } %>
+    </ul>
+    <div class="card-head mt"><h2>À venir</h2><a href="/agenda" class="small">Agenda →</a></div>
+    <ul class="list ev-list">
+    <% for (const ev of events) { const e = h.eventDate(ev.starts_at); %>
+      <li><span class="ev-d"><%= e.day %> <%= e.month %></span><span class="ev-t"><%= ev.title %></span><span class="ev-h muted small"><%= e.time %></span></li>
+    <% } %>
+    <% if (!events.length) { %><li class="muted">Aucun événement prévu.</li><% } %>
+    </ul>
+  </section>
+</div>
+<%- include('partials/footer') %>

@@ -1,0 +1,33 @@
+{
+  "name": "residence-ambre",
+  "version": "1.0.0",
+  "description": "Espace privé des résidents de la Résidence Ambre (gestion de copropriété)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node --disable-warning=ExperimentalWarning server.js",
+    "dev": "node --watch --disable-warning=ExperimentalWarning server.js",
+    "create-admin": "node --disable-warning=ExperimentalWarning scripts/create-admin.js",
+    "seed-demo": "node --disable-warning=ExperimentalWarning scripts/seed-demo.js",
+    "test": "node --disable-warning=ExperimentalWarning --test test/*.test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aligossas1997-eng/Syndic--amber.git"
+  },
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/aligossas1997-eng/Syndic--amber/issues"
+  },
+  "homepage": "https://github.com/aligossas1997-eng/Syndic--amber#readme",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "ejs": "^7.0.2",
+    "express": "^4.22.3",
+    "express-session": "^1.19.0",
+    "multer": "^2.5.0"
+  },
+  "private": true,
+  "engines": {
+    "node": ">=22.13"
+  }
+}

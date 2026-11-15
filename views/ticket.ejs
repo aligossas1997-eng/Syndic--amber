@@ -1,0 +1,37 @@
+<%- include('partials/header') %>
+<p><a href="/signalements" class="small">← Retour aux signalements</a></p>
+<div class="grid grid-2 align-start">
+  <section class="card">
+    <div class="ann-meta"><span class="status status-<%= ticket.status %>"><%= h.TICKET_STATUSES[ticket.status] %></span><span class="tag"><%= h.TICKET_CATEGORIES[ticket.category] %></span><span class="tag <%= ticket.priority === 'haute' ? 'tag-urgent' : '' %>">Priorité <%= h.PRIORITIES[ticket.priority].toLowerCase() %></span></div>
+    <h1>#<%= ticket.id %> · <%= ticket.title %></h1>
+    <p class="muted small">Créé le <%= h.dateTime(ticket.created_at) %> par <%= ticket.first_name %> <%= ticket.last_name %><% if (ticket.location) { %> · 📍 <%= ticket.location %><% } %></p>
+    <div class="prose"><%= ticket.description %></div>
+    <% if (user.role === 'admin') { %>
+      <hr>
+      <p class="small muted">Contact : <%= ticket.email %><% if (ticket.phone) { %> · <%= ticket.phone %><% } %> · Bât. <%= ticket.building %> appt <%= ticket.apartment %></p>
+      <form method="post" action="/signalements/<%= ticket.id %>/statut" class="row">
+        <%- include('partials/csrf') %>
+        <select name="status"><% for (const [k, v] of Object.entries(h.TICKET_STATUSES)) { %><option value="<%= k %>" <%= ticket.status === k ? 'selected' : '' %>><%= v %></option><% } %></select>
+        <button class="btn">Changer le statut</button>
+      </form>
+    <% } %>
+  </section>
+  <section class="card">
+    <h2>Échanges</h2>
+    <% if (!comments.length) { %><p class="muted">Pas encore de réponse du syndic.</p><% } %>
+    <div class="thread">
+    <% for (const c of comments) { %>
+      <div class="msg <%= c.role === 'admin' ? 'msg-admin' : '' %>">
+        <div class="small"><strong><%= c.first_name %> <%= c.last_name %></strong><% if (c.role === 'admin') { %> <span class="tag">Syndic</span><% } %> <span class="muted">· <%= h.dateTime(c.created_at) %></span></div>
+        <div class="prose"><%= c.body %></div>
+      </div>
+    <% } %>
+    </div>
+    <form method="post" action="/signalements/<%= ticket.id %>/commentaires" class="form">
+      <%- include('partials/csrf') %>
+      <label>Ajouter un message<textarea name="body" rows="3" required></textarea></label>
+      <button class="btn btn-primary">Envoyer</button>
+    </form>
+  </section>
+</div>
+<%- include('partials/footer') %>

@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title><%= title %> · Résidence Ambre</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+  <script src="/static/app.js" defer></script>
+</head>
+<body>
+<% if (user) { %>
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <a class="brand" href="/"><span class="brand-mark">A</span><span>Résidence <strong>Ambre</strong></span></a>
+    <input type="checkbox" id="nav-toggle" class="nav-toggle" aria-label="Menu">
+    <label for="nav-toggle" class="nav-burger" aria-hidden="true"><span></span></label>
+    <nav class="nav">
+      <% const links = [['/', 'Accueil'], ['/annonces', 'Annonces'], ['/documents', 'Documents'], ['/signalements', 'Signalements'], ['/charges', 'Mes charges'], ['/agenda', 'Agenda'], ['/contacts', 'Contacts']];
+         if (user.role === 'admin') links.push(['/admin', 'Administration']); %>
+      <% for (const [href, label] of links) { const active = href === '/' ? path === '/' : path.startsWith(href); %>
+        <a href="<%= href %>" class="<%= active ? 'active' : '' %>"><%= label %></a>
+      <% } %>
+      <div class="nav-user">
+        <a href="/mon-compte" class="avatar" title="Mon compte"><%= h.initials(user) %></a>
+        <form method="post" action="/deconnexion"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button class="link">Déconnexion</button></form>
+      </div>
+    </nav>
+  </div>
+</header>
+<% } %>
+<main class="wrap main">
+<% if (flash) { %><div class="flash flash-<%= flash.type %>" role="status"><%= flash.message %></div><% } %>

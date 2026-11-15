@@ -1,0 +1,50 @@
+<%- include('../partials/header') %>
+<div class="page-head"><h1>Appels de fonds</h1>
+  <div class="chips"><a class="chip" href="/admin">Résidents</a><a class="chip on" href="/admin/charges">Appels de fonds</a></div>
+</div>
+<section class="card">
+  <h2>Nouvel appel de fonds</h2>
+  <form method="post" action="/admin/charges" class="form">
+    <%- include('../partials/csrf') %>
+    <div class="row">
+      <label>Libellé<input name="label" required placeholder="Provision charges courantes T1 2027"></label>
+      <label>Période<input name="period" placeholder="T1 2027"></label>
+    </div>
+    <div class="row">
+      <label>Montant (€)<input name="amount" required inputmode="decimal" placeholder="25000,00"></label>
+      <label>Échéance<input type="date" name="due_date" required></label>
+    </div>
+    <label>Destinataire<select name="target" id="target">
+      <option value="all">Tous les copropriétaires — répartition au prorata des tantièmes (total : <%= totalTantiemes %>)</option>
+      <option value="one">Un seul résident (montant individuel)</option>
+    </select></label>
+    <label>Résident (si « un seul résident »)<select name="user_id">
+      <% for (const r of residents) { %><option value="<%= r.id %>"><%= r.building %>-<%= r.apartment %> · <%= r.last_name %> <%= r.first_name %> (<%= r.tantiemes %> t.)</option><% } %>
+    </select></label>
+    <button class="btn btn-primary">Émettre</button>
+    <p class="muted small">En mode « tous », le montant saisi est le <strong>total</strong> de l'appel : chaque copropriétaire reçoit sa quote-part = montant × ses tantièmes ÷ total des tantièmes (arrondis au centime, le reliquat est réparti pour que la somme tombe juste).</p>
+  </form>
+</section>
+<section class="card">
+  <h2>Historique</h2>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Résident</th><th>Libellé</th><th>Échéance</th><th class="num">Montant</th><th>Statut</th><th></th></tr></thead>
+    <tbody>
+    <% for (const c of list) { %>
+      <tr>
+        <td><%= c.building %>-<%= c.apartment %> · <%= c.last_name %></td>
+        <td><%= c.label %><% if (c.period) { %> <span class="muted small">(<%= c.period %>)</span><% } %></td>
+        <td><%= h.date(c.due_date) %></td>
+        <td class="num"><%= h.money(c.amount_cents) %></td>
+        <td><% if (c.paid) { %><span class="status status-resolu">Payé</span><% } else if (h.isOverdue(c)) { %><span class="status status-retard">En retard</span><% } else { %><span class="status status-ouvert">À payer</span><% } %></td>
+        <td class="actions">
+          <form method="post" action="/admin/charges/<%= c.id %>/payee"><%- include('../partials/csrf') %><button class="link small"><%= c.paid ? 'Annuler paiement' : 'Marquer payé' %></button></form>
+          <form method="post" action="/admin/charges/<%= c.id %>/supprimer" data-confirm="Supprimer cette ligne ?"><%- include('../partials/csrf') %><button class="link danger small">Suppr.</button></form>
+        </td>
+      </tr>
+    <% } %>
+    <% if (!list.length) { %><tr><td colspan="6" class="muted">Aucune charge.</td></tr><% } %>
+    </tbody>
+  </table></div>
+</section>
+<%- include('../partials/footer') %>

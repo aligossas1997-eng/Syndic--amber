@@ -1,0 +1,38 @@
+<%- include('partials/header') %>
+<div class="page-head"><h1>Annonces</h1>
+  <div class="chips">
+    <a class="chip <%= !cat ? 'on' : '' %>" href="/annonces">Toutes</a>
+    <% for (const [k, v] of Object.entries(h.ANNOUNCEMENT_CATEGORIES)) { %><a class="chip <%= cat === k ? 'on' : '' %>" href="/annonces?cat=<%= k %>"><%= v %></a><% } %>
+  </div>
+</div>
+
+<% if (user.role === 'admin') { %>
+<details class="card admin-box">
+  <summary>➕ Publier une annonce</summary>
+  <form method="post" action="/annonces" class="form">
+    <%- include('partials/csrf') %>
+    <label>Titre<input name="title" required maxlength="200"></label>
+    <label>Catégorie<select name="category"><% for (const [k, v] of Object.entries(h.ANNOUNCEMENT_CATEGORIES)) { %><option value="<%= k %>"><%= v %></option><% } %></select></label>
+    <label>Contenu<textarea name="body" rows="6" required></textarea></label>
+    <label class="check"><input type="checkbox" name="pinned" value="1"> Épingler en haut</label>
+    <button class="btn btn-primary">Publier</button>
+  </form>
+</details>
+<% } %>
+
+<% if (!list.length) { %><div class="card empty">Aucune annonce.</div><% } %>
+<% for (const a of list) { %>
+  <article class="card announcement <%= a.pinned ? 'pinned' : '' %>">
+    <div class="ann-meta">
+      <span class="tag tag-<%= a.category %>"><%= h.ANNOUNCEMENT_CATEGORIES[a.category] %></span>
+      <% if (a.pinned) { %><span class="pin">📌 Épinglée</span><% } %>
+      <span class="muted small"><%= h.date(a.created_at) %><% if (a.first_name) { %> · <%= a.first_name %> <%= a.last_name %><% } %></span>
+    </div>
+    <h2><%= a.title %></h2>
+    <div class="prose"><%= a.body %></div>
+    <% if (user.role === 'admin') { %>
+      <form method="post" action="/annonces/<%= a.id %>/supprimer" class="inline" data-confirm="Supprimer cette annonce ?"><%- include('partials/csrf') %><button class="link danger small">Supprimer</button></form>
+    <% } %>
+  </article>
+<% } %>
+<%- include('partials/footer') %>

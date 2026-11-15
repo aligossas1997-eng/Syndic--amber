@@ -1,0 +1,42 @@
+<%- include('partials/header') %>
+<div class="page-head"><h1><%= user.role === 'admin' ? 'Tous les signalements' : 'Mes signalements' %></h1>
+  <div class="chips">
+    <a class="chip <%= !status ? 'on' : '' %>" href="/signalements">Tous</a>
+    <% for (const [k, v] of Object.entries(h.TICKET_STATUSES)) { %><a class="chip <%= status === k ? 'on' : '' %>" href="/signalements?statut=<%= k %>"><%= v %></a><% } %>
+  </div>
+</div>
+
+<div class="grid grid-2 align-start">
+  <section class="card">
+    <h2>Signaler un problème</h2>
+    <form method="post" action="/signalements" class="form">
+      <%- include('partials/csrf') %>
+      <label>Objet<input name="title" required maxlength="200" placeholder="Ex : Lumière du hall B en panne"></label>
+      <div class="row">
+        <label>Catégorie<select name="category"><% for (const [k, v] of Object.entries(h.TICKET_CATEGORIES)) { %><option value="<%= k %>"><%= v %></option><% } %></select></label>
+        <label>Urgence<select name="priority"><% for (const [k, v] of Object.entries(h.PRIORITIES)) { %><option value="<%= k %>" <%= k === 'normale' ? 'selected' : '' %>><%= v %></option><% } %></select></label>
+      </div>
+      <label>Emplacement<input name="location" maxlength="200" placeholder="Ex : Bât. B, 2e étage, palier"></label>
+      <label>Description<textarea name="description" rows="5" required placeholder="Décrivez le problème, depuis quand, etc."></textarea></label>
+      <button class="btn btn-primary">Envoyer au syndic</button>
+      <p class="muted small">🚨 Urgence (fuite importante, odeur de gaz, personne bloquée) : appelez directement les numéros d'urgence de la page <a href="/contacts">Contacts</a>.</p>
+    </form>
+  </section>
+  <section class="card">
+    <h2>Suivi</h2>
+    <% if (!list.length) { %><p class="muted">Aucun signalement.</p><% } %>
+    <ul class="ticket-list">
+    <% for (const t of list) { %>
+      <li>
+        <a href="/signalements/<%= t.id %>" class="ticket-link">
+          <span class="ticket-title">#<%= t.id %> · <%= t.title %></span>
+          <span class="muted small"><%= h.TICKET_CATEGORIES[t.category] %> · <%= h.date(t.created_at) %><% if (user.role === 'admin') { %> · <%= t.first_name %> <%= t.last_name %> (<%= t.building %>-<%= t.apartment %>)<% } %><% if (t.comments) { %> · 💬 <%= t.comments %><% } %></span>
+        </a>
+        <span class="status status-<%= t.status %>"><%= h.TICKET_STATUSES[t.status] %></span>
+        <% if (t.priority === 'haute') { %><span class="tag tag-urgent">Urgent</span><% } %>
+      </li>
+    <% } %>
+    </ul>
+  </section>
+</div>
+<%- include('partials/footer') %>

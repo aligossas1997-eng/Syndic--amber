@@ -1,0 +1,58 @@
+<%- include('../partials/header') %>
+<div class="page-head"><h1>Administration</h1>
+  <div class="chips"><a class="chip on" href="/admin">Résidents</a><a class="chip" href="/admin/charges">Appels de fonds</a><a class="chip" href="/signalements?statut=ouvert">Signalements ouverts</a></div>
+</div>
+<div class="grid grid-4 stats">
+  <div class="stat card"><span class="stat-label">Comptes actifs</span><span class="stat-value"><%= stats.residents %></span></div>
+  <div class="stat card"><span class="stat-label">Signalements non résolus</span><span class="stat-value"><%= stats.openTickets %></span></div>
+  <div class="stat card"><span class="stat-label">Charges non encaissées</span><span class="stat-value"><%= h.money(stats.unpaid) %></span></div>
+  <div class="stat card"><span class="stat-label">Dont impayés échus</span><span class="stat-value <%= stats.overdue > 0 ? 'warn' : 'ok' %>"><%= h.money(stats.overdue) %></span></div>
+</div>
+
+<% if (newPassword) { %>
+<div class="card secret">
+  <strong>Identifiants à transmettre au résident (affichés une seule fois) :</strong>
+  <p>Email : <code><%= newPassword.email %></code><br>Mot de passe temporaire : <code><%= newPassword.password %></code></p>
+  <p class="muted small">Le résident devra choisir un nouveau mot de passe à sa première connexion.</p>
+</div>
+<% } %>
+
+<details class="card admin-box">
+  <summary>➕ Créer un compte résident</summary>
+  <form method="post" action="/admin/residents" class="form">
+    <%- include('../partials/csrf') %>
+    <div class="row"><label>Prénom<input name="first_name" required></label><label>Nom<input name="last_name" required></label></div>
+    <div class="row"><label>Email<input type="email" name="email" required></label><label>Téléphone<input name="phone"></label></div>
+    <div class="row"><label>Bâtiment<input name="building" placeholder="A"></label><label>Appartement<input name="apartment" placeholder="12"></label></div>
+    <div class="row"><label>N° de lot<input name="lot_number"></label><label>Tantièmes<input type="number" name="tantiemes" min="0" value="0"></label></div>
+    <div class="row">
+      <label>Statut<select name="status"><option value="proprietaire">Copropriétaire</option><option value="locataire">Locataire</option></select></label>
+      <label>Rôle<select name="role"><option value="resident">Résident</option><option value="admin">Administrateur (syndic / conseil syndical)</option></select></label>
+    </div>
+    <button class="btn btn-primary">Créer le compte</button>
+  </form>
+</details>
+
+<section class="card">
+  <h2>Résidents</h2>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Nom</th><th>Logement</th><th>Lot / tantièmes</th><th>Statut</th><th>Contact</th><th></th></tr></thead>
+    <tbody>
+    <% for (const r of residents) { %>
+      <tr class="<%= r.active ? '' : 'inactive' %>">
+        <td><strong><%= r.last_name %></strong> <%= r.first_name %><% if (r.role === 'admin') { %> <span class="tag">Admin</span><% } %><% if (!r.active) { %> <span class="tag">Désactivé</span><% } %></td>
+        <td><%= r.building || '—' %> / <%= r.apartment || '—' %></td>
+        <td><%= r.lot_number || '—' %> / <%= r.tantiemes %></td>
+        <td><%= r.status === 'locataire' ? 'Locataire' : 'Copropriétaire' %></td>
+        <td class="small"><%= r.email %><br><%= r.phone || '' %></td>
+        <td class="actions">
+          <form method="post" action="/admin/residents/<%= r.id %>/reinitialiser" data-confirm="Générer un nouveau mot de passe temporaire ?"><%- include('../partials/csrf') %><button class="link small">Réinit. mot de passe</button></form>
+          <% if (r.id !== user.id) { %><form method="post" action="/admin/residents/<%= r.id %>/activer"><%- include('../partials/csrf') %><button class="link small <%= r.active ? 'danger' : '' %>"><%= r.active ? 'Désactiver' : 'Réactiver' %></button></form><% } %>
+        </td>
+      </tr>
+    <% } %>
+    </tbody>
+  </table></div>
+  <p class="muted small">Désactiver un compte (déménagement, vente du lot) coupe immédiatement son accès au site.</p>
+</section>
+<%- include('../partials/footer') %>

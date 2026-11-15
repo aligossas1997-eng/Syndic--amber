@@ -1,0 +1,24 @@
+<%- include('partials/header') %>
+<div class="page-head"><h1>Mes charges</h1><p class="muted">Appels de fonds trimestriels, travaux votés en AG et régularisations.</p></div>
+<div class="grid grid-3 stats">
+  <div class="stat card"><span class="stat-label">Reste à payer</span><span class="stat-value <%= totals.due > 0 ? 'warn' : 'ok' %>"><%= h.money(totals.due) %></span></div>
+  <div class="stat card"><span class="stat-label">Déjà réglé</span><span class="stat-value"><%= h.money(totals.paid) %></span></div>
+  <div class="stat card"><span class="stat-label">Tantièmes</span><span class="stat-value"><%= user.tantiemes || '—' %></span><span class="muted small">Quote-part dans les parties communes</span></div>
+</div>
+<section class="card">
+  <% if (!list.length) { %><p class="muted">Aucun appel de fonds enregistré.</p><% } else { %>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Libellé</th><th>Période</th><th>Échéance</th><th class="num">Montant</th><th>Statut</th></tr></thead>
+    <tbody>
+    <% for (const c of list) { %>
+      <tr>
+        <td><%= c.label %></td><td><%= c.period || '—' %></td><td><%= h.date(c.due_date) %></td><td class="num"><%= h.money(c.amount_cents) %></td>
+        <td><% if (c.paid) { %><span class="status status-resolu">Payé</span><% } else if (h.isOverdue(c)) { %><span class="status status-retard">En retard</span><% } else { %><span class="status status-ouvert">À payer</span><% } %></td>
+      </tr>
+    <% } %>
+    </tbody>
+  </table></div>
+  <% } %>
+  <p class="muted small">Le paiement se fait par virement ou prélèvement auprès du syndic. Une question sur votre décompte ? Ouvrez un <a href="/signalements">signalement</a> catégorie « Autre ».</p>
+</section>
+<%- include('partials/footer') %>

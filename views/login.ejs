@@ -1,0 +1,15 @@
+<%- include('partials/header') %>
+<div class="login">
+  <div class="login-card">
+    <div class="login-brand"><span class="brand-mark big">A</span><h1>Résidence Ambre</h1><p>Espace privé des résidents</p></div>
+    <% if (error) { %><div class="flash flash-error"><%= error %></div><% } %>
+    <form method="post" action="/connexion" class="form">
+      <%- include('partials/csrf') %>
+      <label>Adresse email<input type="email" name="email" value="<%= email %>" required autocomplete="username" autofocus></label>
+      <label>Mot de passe<input type="password" name="password" required autocomplete="current-password"></label>
+      <button class="btn btn-primary btn-block">Se connecter</button>
+    </form>
+    <p class="muted small center">Pas encore de compte ? Les accès sont créés par le syndic ou le conseil syndical. Contactez-les pour obtenir vos identifiants.</p>
+  </div>
+</div>
+<%- include('partials/footer') %>
