@@ -66,3 +66,19 @@ génère tout seul la clé secrète `SESSION_SECRET` et crée les données de d�
 Limite de l'offre gratuite : le site s'endort après 15 min sans visite (premier chargement ≈ 1 min) et la base SQLite
 n'est pas conservée quand il redémarre (on repart des données de démo). Pour un usage réel avec des données durables,
 il faudra une base hébergée (PostgreSQL) ou un disque persistant (offre payante).
+
+## Passer en offre payante et garder les données
+
+Le code est déjà prêt : il suffit de dire au site d'écrire sa base sur un **disque persistant**.
+Au premier démarrage sur ce disque, les données de démo sont créées une fois, puis **plus jamais écrasées**.
+
+Dans le tableau de bord Render, sur le service `site-syndic` :
+
+1. **Settings → Instance Type** : choisir **Starter** (environ 7 $/mois). Le site ne s'endort plus.
+2. **Disks → Add Disk** : nom `donnees`, *Mount Path* `/var/data`, taille **1 GB** (environ 0,25 $/mois).
+3. **Environment → Add Environment Variable** : `DATABASE_PATH` = `/var/data/syndic.db`, puis **Save Changes**.
+4. Render redéploie tout seul (2–3 min). Les paiements, appels et échéanciers saisis sont désormais conservés.
+
+Avant d'y mettre de vraies données : passer `DEMO` à `false` (les comptes de démo ne s'affichent plus sur la page de connexion),
+et prévoir la création des vrais comptes résidents et le changement des mots de passe (à ajouter au site).
+Sauvegarde : Render fait un instantané quotidien du disque (onglet *Disks*).

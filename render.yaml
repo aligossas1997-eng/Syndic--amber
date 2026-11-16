@@ -17,3 +17,14 @@ services:
         value: "true"
       - key: DEMO
         value: "true"
+
+# --- Passage en offre payante (données conservées) ---
+# Sur l'offre Starter, décommente les lignes ci-dessous (dans le service, au même niveau que envVars)
+# et ajoute la variable DATABASE_PATH : la base est alors écrite sur un disque qui survit aux redémarrages.
+#    plan: starter
+#    disk:
+#      name: donnees
+#      mountPath: /var/data
+#      sizeGB: 1
+#  (variable)  - key: DATABASE_PATH
+#                value: /var/data/syndic.db
