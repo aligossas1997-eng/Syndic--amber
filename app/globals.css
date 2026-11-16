@@ -52,3 +52,18 @@ a.btn.secondary { background: var(--primary-soft); color: var(--primary); }
 dl.info { display: grid; grid-template-columns: max-content 1fr; gap: .35rem 1rem; margin: 0; font-size: .9rem; }
 dl.info dt { color: var(--muted); }
 dl.info dd { margin: 0; }
+button.small { padding: .3rem .6rem; font-size: .8rem; }
+.fiches { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); }
+.fiche dl.info dd { overflow-wrap: anywhere; min-width: 0; }
+.fiche { border: 2px dashed var(--border); border-radius: 10px; padding: 1rem 1.2rem; break-inside: avoid; page-break-inside: avoid; }
+.fiche-titre { font-weight: 700; font-size: 1.1rem; color: var(--primary); }
+code.gros { font-size: 1.05rem; font-weight: 700; }
+textarea { min-height: 140px; font-family: ui-monospace, monospace; font-size: .85rem; }
+details summary { cursor: pointer; font-weight: 600; }
+@media print {
+  .topbar, .no-print { display: none !important; }
+  body { background: #fff; }
+  main { padding: 0; max-width: none; }
+  .card.fiches-zone { border: 0; padding: 0; }
+  .fiches { grid-template-columns: 1fr 1fr; }
+}

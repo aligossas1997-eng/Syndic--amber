@@ -12,6 +12,7 @@ export default async function SyndicLayout({ children }) {
       <TopBar user={user} brand={r?.nom || 'Syndic'} links={[
         ['/syndic', 'Tableau de bord'], ['/syndic/lots', 'Comptes copropriétaires'], ['/syndic/impayes', 'Impayés'],
         ['/syndic/paiements', 'Encaissements'], ['/syndic/appels', 'Appels de fonds'],
+        ['/syndic/acces', 'Accès résidents'], ['/syndic/parametres', 'Paramètres'],
       ]} />
       <main>{children}</main>
     </>

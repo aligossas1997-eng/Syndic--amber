@@ -8,6 +8,7 @@ export default function TopBar({ user, links, brand }) {
       <nav>{links.map(([href, label]) => <Link key={href} href={href}>{label}</Link>)}</nav>
       <div className="user">
         <span>{user.nom} · {user.role === 'syndic' ? 'Syndic' : 'Copropriétaire'}</span>
+        <Link href="/mot-de-passe">Mot de passe</Link>
         <form action={logout}><button>Déconnexion</button></form>
       </div>
     </header>

@@ -7,7 +7,7 @@ export default function LoginForm() {
   return (
     <form action={action} className="stack">
       {state?.error && <div className="alert bad">{state.error}</div>}
-      <label>Email<input name="email" type="email" required autoComplete="username" defaultValue={state?.email || ""} key={state?.email} /></label>
+      <label>Email ou identifiant<input name="email" type="text" required autoComplete="username" autoCapitalize="none" defaultValue={state?.email || ""} key={state?.email} /></label>
       <label>Mot de passe<input name="password" type="password" required autoComplete="current-password" /></label>
       <button className="primary" disabled={pending}>{pending ? 'Connexion…' : 'Se connecter'}</button>
     </form>

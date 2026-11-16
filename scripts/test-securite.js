@@ -7,7 +7,7 @@ const BASE = process.env.BASE_URL || 'http://localhost:3000';
 const db = new Database(process.env.DATABASE_PATH || path.join(process.cwd(), 'data', 'syndic.db'), { readonly: true });
 let ok = 0, ko = 0;
 const check = (nom, cond) => { cond ? ok++ : ko++; console.log(`${cond ? '✅' : '❌'} ${nom}`); };
-const get = async (url, uid) => fetch(BASE + url, { redirect: 'manual', headers: uid === undefined ? {} : { cookie: `${COOKIE_NAME}=${typeof uid === 'string' ? uid : await signSession({ uid })}` } });
+const get = async (url, uid) => fetch(BASE + url, { redirect: 'manual', headers: uid === undefined ? {} : { cookie: `${COOKIE_NAME}=${typeof uid === 'string' ? uid : await signSession({ uid, v: db.prepare('SELECT password_hash h FROM users WHERE id = ?').get(uid).h.slice(-10) })}` } });
 
 const res = db.prepare("SELECT u.id, u.lot_id, l.numero, l.proprietaire FROM users u JOIN lots l ON l.id = u.lot_id WHERE u.email = 'sophie.martin@demo.fr'").get();
 const autre = db.prepare("SELECT l.id, l.numero, l.proprietaire FROM lots l WHERE l.id <> ? LIMIT 1").get(res.lot_id);

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { compteLot, aujourdhui } from '@/lib/finance';
 import { eur, MODES_PAIEMENT, CATEGORIES } from '@/lib/format';
 import { Kpis, Releve, DetailAppels, Echeancier, Paiements } from '@/components/Compte';
+import { modifierLot } from '../../actions-acces';
 import { enregistrerPaiement, ajouterAppelIndividuel, changerModePaiement, creerEcheancier, cloturerEcheancier } from '../../actions';
 
 export default async function FicheLot({ params, searchParams }) {
@@ -89,6 +90,27 @@ export default async function FicheLot({ params, searchParams }) {
         </form>
       </div>
       <Paiements c={c} />
+      <div className="card">
+        <details>
+          <summary>Modifier les informations du lot</summary>
+          <form action={modifierLot} className="stack" style={{ marginTop: '.8rem' }}>
+            <input type="hidden" name="lot_id" value={lot.id} />
+            <div className="row">
+              <label>Propriétaire<input name="proprietaire" defaultValue={lot.proprietaire} required /></label>
+              <label>Email<input name="email" type="email" defaultValue={lot.email || ''} /></label>
+              <label>Téléphone<input name="telephone" defaultValue={lot.telephone || ''} /></label>
+            </div>
+            <div className="row">
+              <label>Bâtiment<input name="batiment" defaultValue={lot.batiment || ''} /></label>
+              <label>Étage<input name="etage" defaultValue={lot.etage ?? ''} /></label>
+              <label>Type<input name="type" defaultValue={lot.type || ''} /></label>
+              <label>Surface (m²)<input name="surface" defaultValue={lot.surface ?? ''} /></label>
+              <label>Tantièmes<input name="tantiemes" defaultValue={lot.tantiemes} required /></label>
+            </div>
+            <button className="primary">Enregistrer</button>
+          </form>
+        </details>
+      </div>
       <p className="small muted">Solde actuel : {eur(c.solde)}</p>
     </>
   );

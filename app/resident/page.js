@@ -1,5 +1,5 @@
 import { requireResident } from '@/lib/auth';
-import { getResidence } from '@/lib/db';
+import { getDb, getResidence } from '@/lib/db';
 import { compteLot } from '@/lib/finance';
 import { eur } from '@/lib/format';
 import { Kpis, Releve, DetailAppels, Echeancier, Paiements } from '@/components/Compte';
@@ -10,11 +10,12 @@ export default async function MonCompte() {
   const user = await requireResident();
   const c = compteLot(user.lot_id);
   const r = getResidence();
+  const totalT = getDb().prepare('SELECT SUM(tantiemes) t FROM lots').get().t;
   const { lot } = c;
   return (
     <>
       <h1>Mon appartement · Lot {lot.numero}</h1>
-      <p className="muted small">Bât. {lot.batiment}, étage {lot.etage} · {lot.type} · {lot.surface} m² · {lot.tantiemes} / {r.total_tantiemes} tantièmes</p>
+      <p className="muted small">Bât. {lot.batiment}, étage {lot.etage} · {lot.type} · {lot.surface} m² · {lot.tantiemes} / {totalT} tantièmes</p>
       <Kpis c={c} />
       <div className="grid2">
         <div className="card">

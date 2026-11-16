@@ -39,6 +39,17 @@ Tous les résidents : `prenom.nom@demo.fr` / `resident123` (12 lots, bâtiments 
 - *Encaissements* : journal de tous les paiements, totaux par mode de paiement.
 - *Appels de fonds* : émission d'un appel global réparti au prorata des tantièmes (l'écart d'arrondi est corrigé pour que la somme tombe juste au centime).
 
+**Accès des résidents** (menu *Accès résidents*)
+- Un bouton crée d'un coup les accès de tous les appartements qui n'en ont pas. L'identifiant est l'email du copropriétaire, ou `lot-a01` s'il n'a pas d'email.
+- Le site génère un **mot de passe provisoire** et affiche des **fiches imprimables** (une par appartement) à remettre en main propre ou par courrier. Ces mots de passe ne s'affichent qu'une fois.
+- À la **première connexion**, le résident doit choisir son propre mot de passe (10 caractères min.) : le syndic ne le connaît jamais.
+- Mot de passe oublié : bouton *Nouveau mot de passe*, qui génère une nouvelle fiche et coupe les anciennes sessions. Déménagement : bouton *Désactiver*.
+- 8 essais ratés en 15 min bloquent temporairement la connexion.
+
+**Lots** (menu *Comptes copropriétaires*, en bas) : ajout d'un lot, ou **import depuis Excel** par copier-coller des colonnes
+`Numéro | Bâtiment | Étage | Type | Surface | Tantièmes | Propriétaire | Email | Téléphone`. Chaque fiche lot a aussi un bloc *Modifier les informations du lot*.
+**Paramètres** : nom de la résidence, adresse, nom du syndic, IBAN/BIC affichés aux résidents, budget annuel.
+
 **Espace résident** : son solde, ses arriérés, sa prochaine échéance, ses appels, ses paiements et reçus PDF, son échéancier, l'IBAN et la référence à indiquer pour payer.
 
 ## Sécurité (cloisonnement des données)
@@ -79,6 +90,22 @@ Dans le tableau de bord Render, sur le service `site-syndic` :
 3. **Environment → Add Environment Variable** : `DATABASE_PATH` = `/var/data/syndic.db`, puis **Save Changes**.
 4. Render redéploie tout seul (2–3 min). Les paiements, appels et échéanciers saisis sont désormais conservés.
 
-Avant d'y mettre de vraies données : passer `DEMO` à `false` (les comptes de démo ne s'affichent plus sur la page de connexion),
-et prévoir la création des vrais comptes résidents et le changement des mots de passe (à ajouter au site).
+### Démarrer avec ta vraie copro (sans les données de démo)
+
+À faire **en même temps** que l'ajout du disque (étape 3 ci-dessus), dans *Environment* :
+
+| Variable | Valeur |
+|---|---|
+| `DEMO` | `false` |
+| `ADMIN_EMAIL` | ton email (ce sera ton identifiant syndic) |
+| `ADMIN_PASSWORD` | un mot de passe provisoire, que le site te fera changer à la 1re connexion |
+| `RESIDENCE_NOM` | le nom de la résidence (modifiable ensuite dans *Paramètres*) |
+
+Au démarrage, le site crée une résidence **vide** avec ton compte syndic. Ensuite :
+1. *Paramètres* : adresse, IBAN, budget annuel.
+2. *Comptes copropriétaires* → **Importer depuis Excel** tes 20 appartements.
+3. *Appels de fonds* : émets le premier appel (réparti aux tantièmes).
+4. *Accès résidents* → **Créer les accès manquants** → **Imprimer les fiches**, puis distribue-les.
+
+Une base qui contient déjà des comptes n'est jamais écrasée au redémarrage.
 Sauvegarde : Render fait un instantané quotidien du disque (onglet *Disks*).
