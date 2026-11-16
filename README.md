@@ -1,0 +1,68 @@
+# Site de gestion syndic – Résidence Les Tilleuls (démo)
+
+Application web pour un syndic de copropriété, avec deux espaces :
+
+| Rôle | Ce qu'il voit |
+|---|---|
+| **Syndic** | Tous les comptes copropriétaires, les arriérés (balance âgée), les modalités de paiement, les échéanciers, tous les reçus. Il enregistre les paiements, émet les appels de fonds, accorde des échéanciers. |
+| **Résident** | Uniquement **son** appartement : solde, arriéré, appels de fonds, paiements, reçus PDF, échéancier, coordonnées bancaires pour payer. |
+
+## Lancer le site sur ton ordinateur
+
+1. Installer **Node.js 22** (ou plus récent) : https://nodejs.org (bouton « LTS »).
+2. Ouvrir un terminal dans ce dossier, puis :
+   ```bash
+   npm install          # installe les dépendances (une seule fois)
+   npm run seed         # crée la base de démo (à relancer pour tout remettre à zéro)
+   npm run dev          # démarre le site
+   ```
+3. Ouvrir http://localhost:3000
+
+### Comptes de démo
+
+| Rôle | Email | Mot de passe |
+|---|---|---|
+| Syndic | `syndic@demo.fr` | `syndic123` |
+| Résident à jour | `sophie.martin@demo.fr` | `resident123` |
+| Résident en gros impayé | `pierre.dubois@demo.fr` | `resident123` |
+| Résident sous échéancier | `mamadou.diallo@demo.fr` | `resident123` |
+
+Tous les résidents : `prenom.nom@demo.fr` / `resident123` (12 lots, bâtiments A et B).
+
+## Fonctionnalités
+
+**Espace syndic**
+- *Tableau de bord* : appelé échu, encaissé, arriérés, taux de recouvrement, avances, balance âgée, principaux débiteurs.
+- *Comptes copropriétaires* : un tableau de tous les lots (tantièmes, appelé, payé, solde, arriéré, retard, mode de paiement, statut).
+- *Fiche lot* : relevé de compte avec solde cumulé, imputation des paiements sur les appels (les plus anciens d'abord), enregistrement d'un paiement (génère un reçu numéroté R-AAAA-NNNN), changement du mode de paiement, création/clôture d'un échéancier, ajout d'un appel individuel (frais, régularisation).
+- *Impayés* : balance âgée par lot (non échu, 1–30 j, 31–90 j, 91–180 j, > 180 j) + export CSV qui s'ouvre directement dans Excel.
+- *Encaissements* : journal de tous les paiements, totaux par mode de paiement.
+- *Appels de fonds* : émission d'un appel global réparti au prorata des tantièmes (l'écart d'arrondi est corrigé pour que la somme tombe juste au centime).
+
+**Espace résident** : son solde, ses arriérés, sa prochaine échéance, ses appels, ses paiements et reçus PDF, son échéancier, l'IBAN et la référence à indiquer pour payer.
+
+## Sécurité (cloisonnement des données)
+
+- Mots de passe hachés (bcrypt), session dans un cookie signé `httpOnly` valable 8 h.
+- Le rôle et l'appartement d'un utilisateur sont **toujours relus en base** côté serveur, jamais pris dans l'URL ou le navigateur.
+- La page résident n'a pas d'identifiant d'appartement dans l'URL : elle affiche le lot de la personne connectée, point.
+- Chaque page et chaque action du syndic revérifie le rôle côté serveur.
+- Un reçu PDF d'un autre lot renvoie « introuvable » (404) pour un résident.
+- Test automatique : lancer le site, puis `npm run test:securite` (17 vérifications).
+
+## Choix techniques (par défaut)
+
+- **Next.js 16** (React) pour le site, **SQLite** (un simple fichier `data/syndic.db`) pour la base, **pdf-lib** pour les reçus.
+- Montants stockés en centimes pour éviter les erreurs d'arrondi.
+- **Pas de paiement en ligne** : le syndic enregistre les paiements reçus (virement, prélèvement, chèque, CB, espèces). Un paiement par carte (Stripe) ou par prélèvement SEPA pourra être ajouté plus tard.
+
+## Mise en ligne (Render, gratuit)
+
+Le fichier `render.yaml` décrit tout : il suffit de cliquer sur
+[Deploy to Render](https://render.com/deploy?repo=https://github.com/aligossas1997-eng/Syndic--amber/tree/site-syndic),
+de se connecter avec GitHub puis de cliquer sur **Deploy Blueprint**. Render installe, construit et démarre le site,
+génère tout seul la clé secrète `SESSION_SECRET` et crée les données de démo au premier démarrage.
+
+Limite de l'offre gratuite : le site s'endort après 15 min sans visite (premier chargement ≈ 1 min) et la base SQLite
+n'est pas conservée quand il redémarre (on repart des données de démo). Pour un usage réel avec des données durables,
+il faudra une base hébergée (PostgreSQL) ou un disque persistant (offre payante).

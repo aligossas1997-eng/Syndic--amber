@@ -1,0 +1,19 @@
+# Déploiement en un clic sur Render (offre gratuite)
+services:
+  - type: web
+    name: site-syndic
+    runtime: node
+    plan: free
+    branch: site-syndic
+    buildCommand: npm ci && npm run build
+    startCommand: npm run start:prod
+    healthCheckPath: /login
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: COOKIE_SECURE
+        value: "true"
+      - key: DEMO
+        value: "true"

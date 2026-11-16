@@ -1,0 +1,10 @@
+import { redirect } from 'next/navigation';
+import { getUser } from '@/lib/auth';
+
+export const dynamic = 'force-dynamic';
+
+export default async function Home() {
+  const u = await getUser();
+  if (!u) redirect('/login');
+  redirect(u.role === 'syndic' ? '/syndic' : '/resident');
+}

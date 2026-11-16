@@ -1,0 +1,27 @@
+{
+  "name": "site-syndic",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "seed": "node scripts/seed.js",
+    "test:securite": "node scripts/test-securite.js",
+    "start:prod": "node scripts/seed-if-empty.js && next start"
+  },
+  "dependencies": {
+    "bcryptjs": "3.0.3",
+    "better-sqlite3": "12.11.1",
+    "jose": "6.2.17",
+    "next": "16.4.6",
+    "pdf-lib": "1.17.1",
+    "react": "19.2.9",
+    "react-dom": "19.2.9",
+    "server-only": "^0.0.1"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
